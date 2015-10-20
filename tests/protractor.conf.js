@@ -52,9 +52,12 @@ switch(process.env.BROWSER) {
 
       getMultiCapabilities: helper.getFirefoxProfile,
 
-      seleniumAddress: 'http://hub.browserstack.com/wd/hub',
+      //seleniumAddress: 'http://hub.browserstack.com/wd/hub',
+      directConnect: true,
 
       baseUrl: 'http://localhost:5000/',
+
+      firefoxPath: process.env.BROWSERBIN,
 
       framework: 'jasmine',
 
@@ -82,7 +85,7 @@ switch(process.env.BROWSER) {
           'args': ['auto-select-desktop-capture-source="Entire screen"',
             'use-fake-device-for-media-stream',
             'use-fake-ui-for-media-stream'],
-          'binary': process.env.CHROME_BIN
+          'binary': process.env.BROWSERBIN
         }
       },
 

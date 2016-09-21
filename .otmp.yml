@@ -1,0 +1,10 @@
+name: OpenTok Meet
+author: Adam Ullman - support@tokbox.com
+website: https://meet.tokbox.com
+tags:
+ - Demo
+ - Screen Sharing
+image: https://avatars2.githubusercontent.com/u/733672
+description: OpenTok reference app, with screen sharing, shared whiteboard, and archiving.
+platforms:
+ - js

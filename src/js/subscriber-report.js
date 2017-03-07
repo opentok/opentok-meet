@@ -36,6 +36,7 @@ angular.module('opentok-meet').directive('subscriberReport', ['OTSession', 'Repo
         'ng-class="{\'show-report\': showReport}"></button>' +
         '<div class="show-report-info" ng-show="showReport">' +
         '<p>Audio Score: <select ng-model="report.audioScore">' +
+        '<option value="-1">Dont know.</option>' +
         '<option value="1">Bad. Very annoying.</option>' +
         '<option value="2">Poor. Annoying.</option>' +
         '<option value="3" selected="selected">Fair. Slightly annoying.</option>' +
@@ -43,6 +44,7 @@ angular.module('opentok-meet').directive('subscriberReport', ['OTSession', 'Repo
         '<option value="5">Excellent. Imperceptible impairment.</option>' +
         '</select></p>' +
         '<p>Video Score: <select ng-model="report.videoScore">' +
+        '<option value="-1">Dont know.</option>' +
         '<option value="1">Bad. Very annoying.</option>' +
         '<option value="2">Poor. Annoying.</option>' +
         '<option value="3" selected="selected">Fair. Slightly annoying.</option>' +

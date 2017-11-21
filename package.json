@@ -71,7 +71,7 @@
     "null-loader": "^0.1.1",
     "opentok-test-scripts": "^3.6.0",
     "protractor": "^4.0.9",
-    "protractor-flake": "^2.1.2",
+    "protractor-flake": "^2.5.0",
     "q": "^1.2.0",
     "travis-multirunner": "^4.2.0",
     "uuid": "^2.0.1"

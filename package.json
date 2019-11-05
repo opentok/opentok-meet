@@ -44,7 +44,7 @@
     "postinstall": "webpack",
     "test": "./node_modules/.bin/run-tests",
     "tdd": "node node_modules/karma/bin/karma start tests/karma-debug.conf.js",
-    "start": "node app.js",
+    "start": "webpack && node app.js",
     "unit": "karma start tests/karma.conf.js --single-run",
     "preintegration": "npm run update-webdriver",
     "integration": "protractor-flake --max-attempts=5 -- tests/protractor.conf.js",

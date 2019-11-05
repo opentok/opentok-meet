@@ -62,6 +62,8 @@ module.exports = (app, config, redis, ot, redirectSSL) => {
               token: otSDK.generateToken(sessionId, {
                 role: 'publisher',
               }),
+              callStatsAppId: config.callStatsAppId,
+              callStatsAppSecret: config.callStatsAppSecret,
             });
           }
         };

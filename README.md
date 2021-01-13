@@ -27,10 +27,11 @@ If you push to the master branch of this repo [Travis](https://travis-ci.org/ope
 
 - Ensure redis is running (e.g. `redis-server` on mac)
 
-- Install npm dependencies
+- Install npm dependencies and build the web project
 
 ```
 npm i
+npm run build
 ```
 
 - Run the server:

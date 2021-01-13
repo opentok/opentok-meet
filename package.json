@@ -42,6 +42,7 @@
   },
   "scripts": {
     "postinstall": "webpack",
+    "build": "webpack",
     "test": "./node_modules/.bin/run-tests",
     "tdd": "node node_modules/karma/bin/karma start tests/karma-debug.conf.js",
     "start": "node app.js",

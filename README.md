@@ -8,9 +8,8 @@ Opentok app with screen sharing using the WebRTC screen sharing and Archiving fe
 
 ## Disclaimer
 
-> This is a fork of the [opentok-meet](https://github.com/aullman/opentok-meet) project that deploys to [meet.tokbox.com](https://meet.tokbox.com). It is pointing to the OpenTok nightly environment which is experimental and likely to break. It also includes experimental features.
-
-> If you wish to fork this project, please fork the [parent project](https://github.com/aullman/opentok-meet).
+> This project deploys to [meet.tokbox.com](https://meet.tokbox.com). It is pointing to the OpenTok nightly environment which is experimental and likely to break. It also includes experimental features.
+> This was originally a fork of [aullman/opentok-meet](https://github.com/aullman/opentok-meet) but is now diverged and is not updated with changes made there.
 
 ## Deploying to meet.tokbox.com
 
@@ -24,6 +23,7 @@ If you push to the master branch of this repo [Travis](https://travis-ci.org/ope
 ## Running meet locally
 
 - Copy the contents of `config.json.sample` into `config.json` and add your credentials.
+  :warning: Note: the default config points to tbdev. If you intend to use a production api key you must change `apiUrl` and `opentokJs` to point to production endpoints.
 
 - Ensure redis is running (e.g. `redis-server` on mac)
 

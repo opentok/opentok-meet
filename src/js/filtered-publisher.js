@@ -25,7 +25,7 @@ angular.module('opentok-meet').directive('filteredPublisher', ['OTSession', '$ro
         const props = angular.copy(scope.props() || {});
 
         props.mirror = true;
-        props.resolution = '640x480';
+        props.resolution = '320x240';
         props.width = props.width ? props.width : angular.element(element).width();
         props.height = props.height ? props.height : angular.element(element).height();
         const oldChildren = angular.element(element).children();

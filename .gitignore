@@ -17,7 +17,7 @@ npm-debug.log
 bower_components
 
 public/js/*
-!public/js/localOT.js
+!public/js/localOt.js
 
 
 config.json

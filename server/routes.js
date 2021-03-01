@@ -1,5 +1,6 @@
 const OpenTok = require('opentok');
 const roomstore = require('./roomstore.js');
+const request = require('request');
 
 module.exports = (app, config, redis, ot, redirectSSL) => {
   const RoomStore = roomstore(redis, ot);
@@ -54,15 +55,35 @@ module.exports = (app, config, redis, ot, redirectSSL) => {
             if (pApiKey && pSecret) {
               otSDK = new OpenTok(pApiKey, pSecret, 'https://anvil-tbdev.opentok.com');
             }
-            res.send({
-              room,
-              sessionId,
-              apiKey: (pApiKey && pSecret) ? pApiKey : config.apiKey,
-              p2p: RoomStore.isP2P(room),
-              token: otSDK.generateToken(sessionId, {
-                role: 'publisher',
-              }),
+
+            const token = otSDK.generateToken(sessionId, {
+              role: 'publisher',
             });
+            const headers = {
+              'X-OPENTOK-AUTH': token,
+              'X-TB-CLIENT-VERSION': 'honeycomb',
+              'X-TB-VERSION': '1',
+              'Accept': 'application/json'
+            };
+            const url = `${config.apiUrl}/session/${sessionId}?extended=true`;
+            request( { url, headers }, function (error, response, body) {
+              if (error) {
+                console.log('error in get session info');
+              } else {
+                const body_parsed = JSON.parse(body);
+                const username = body_parsed[0]['ice_servers'][0]['username'];
+                const credential = body_parsed[0]['ice_servers'][0]['credential'];
+                res.send({
+                  room,
+                  sessionId,
+                  apiKey: (pApiKey && pSecret) ? pApiKey : config.apiKey,
+                  p2p: RoomStore.isP2P(room),
+                  token,
+                  username,
+                  credential,
+                });
+              }
+            }); 
           }
         };
         RoomStore.getRoom(room, apiKey, secret, goToRoom);

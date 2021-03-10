@@ -462,6 +462,11 @@ button:disabled {
     z-index: 98;
 }
 
+#footer .watermark {
+  color: white;
+  text-align: center;
+}
+
 #screenShareUnsupported {
     opacity: 0;
     transition: opacity 200ms ease;

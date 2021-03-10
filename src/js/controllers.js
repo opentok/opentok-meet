@@ -150,6 +150,11 @@ angular.module('opentok-meet').controller('RoomCtrl', ['$scope', '$http', '$wind
       $scope.textChatUnread = false;
     };
 
+    $scope.toggleWebcomposing = () => {
+      console.log(baseURL);
+      $window.open(`${baseURL + $scope.room}/webviewcomposerapp`);
+    };
+
     NotificationService.init();
 
     // Fetch the room info

@@ -130,6 +130,10 @@
                 ng-if="!p2p && connected" ng-class="{green: !archiving, red: archiving}" class="icon-left ion-ios7-recording"
                 ng-click="toggleArchiving()" title="Record">Record</button>
 
+            <button type="button" name="webcomposer" id="webComposerBtn"
+                ng-if="!p2p && connected" ng-class="{green: !webcomposing, red: webcomposing}" class="icon-left ion-ios7-recording"
+                ng-click="toggleWebcomposing()" title="Webcomposer">Webcomposer</button>
+3
             <button type="button" name="muteCamera" mute-publisher ng-if="publishing" ng-class="{green: mutedVideo, red: !mutedVideo}" publisher-id="facePublisher" class="icon-left ion ion-person">Camera</button>
 
             <button type="button" name="muteMicrophone" muted-type="Audio" ng-if="publishing" mute-publisher ng-class="{green: mutedAudio, red: !mutedAudio, 'ion-ios7-mic-off': mutedAudio, 'ion-ios7-mic': !mutedAudio}" publisher-id="facePublisher" class="icon-left ion">Mic</button>

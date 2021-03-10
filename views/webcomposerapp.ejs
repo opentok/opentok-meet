@@ -1,0 +1,96 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+    "http://www.w3.org/TR/html4/strict.dtd">
+<html ng-app="opentok-meet">
+    <head>
+        <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+        <meta content="utf-8" http-equiv="encoding">
+        <meta http-equiv="X-UA-Compatible" content="chrome=1">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1, viewport-fit=cover">
+        <link rel="chrome-webstore-item" href="https://chrome.google.com/webstore/detail/<%=chromeExtensionId%>">
+        <link rel="icon" sizes="128x128" href="icon.png">
+        <title>OpenTok Meet : <%=room%></title>
+        <link href='//fonts.googleapis.com/css?family=Ropa+Sans' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="/css/main.css" media="screen" title="no title" charset="utf-8">
+        <link rel="stylesheet" href="/css/ng-embed.min.css" media="screen" title="no title" charset="utf-8">
+        <script type="text/javascript">
+          window.OTProperties = { enableErrorReporting: true };
+        </script>
+        <script src="/js/commons.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="<%=opentokJs%>"></script>
+        <link rel="stylesheet" href="//code.ionicframework.com/ionicons/1.5.2/css/ionicons.min.css" type="text/css" media="screen" title="no title" charset="utf-8">
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.14.2/codemirror.css" media="screen" title="no title" charset="utf-8">
+        <script src="/js/room.bundle.min.js" type="text/javascript" charset="utf-8"></script>
+    </head>
+    <body ng-controller="WebViewComposerAppCtrl" class="mouse-move">
+        <div id='session' ng-class="{'session-connected': connected}">
+            <ot-layout props="layoutProps">
+                <ot-subscriber ng-repeat="stream in streams | filter:notMine"
+                    stream="stream"
+                    props="{style: {nameDisplayMode: 'off'}}"
+                    ng-class="{OT_big: expanded}"
+                    ng-dblclick="$emit('changeSize')">
+                        <subscriber-stats stream="stream"></subscriber-stats>
+                        <subscriber-report stream="stream"></subscriber-report>
+                        <restrict-framerate></restrict-framerate>
+                        <mute-video mute-subscriber></mute-video>
+                        <expand-button></expand-button>
+                        <zoom-button zoomed="expanded ? bigZoomed : zoomed"
+                          ng-click="$emit('changeZoom', expanded);"></zoom-button>
+                </ot-subscriber>
+            </ot-layout>
+        </div>
+        <i id="loader" ng-if="!connected" class="ion-loading-c"></i>
+        <div id="shareInfo"
+            ng-if="connected && connections.length < 2 && !reconnecting"
+            ng-cloak>
+            <p>Waiting for someone to join: <a href="{{shareURL}}">{{shareURL}}</a></p>
+            <p>
+            <strong>Disclaimer</strong>: This application is running on an unstable version of the OpenTok infrastructure.
+            Use <a href="https://opentok-meet.herokuapp.com/<%=room%>">opentok-meet.herokuapp.com</a> for the production version.
+            </p>
+            <div id="nativeLink">
+            <a href="https://mobile-meet.tokbox.com" target="_blank">
+                <img src="/images/white-phone.png">
+                Remember to try the mobile app for iOS or Android or Desktop app for Mac OS!
+            </a>
+            </div>
+        </div>
+        <reconnecting-overlay id="reconnectingOverlay"
+            ng-if="reconnecting"
+            ng-cloak>
+        </reconnecting-overlay>
+        <div id="footer">
+            <span class="watermark">Web View Composer POC App</span>
+        </div>
+        <i id="connCount" class="ion-ios7-people" title="{{connections.length}} participant in the room"> {{connections.length}}</i>
+        <div id="statusMessages">
+            <div id="archiveStatus" class="statusMessage" ng-if="archiveId">
+                Recording: When recording is ready it will be available <a href="/{{room}}/archive/{{archiveId}}" target="_blank">here</a>
+            </div>
+            <screen-share-dialogs></screen-share-dialogs>
+            <ot-errors></ot-errors>
+        </div>
+        <script type="text/javascript" charset="utf-8">
+            angular.module('opentok-meet').value({
+                room: '<%=room%>',
+                baseURL: '/',
+                chromeExtensionId: '<%=chromeExtensionId%>'
+            });
+        </script>
+        <script type="text/javascript">
+
+          var _gaq = _gaq || [];
+          _gaq.push(['_setAccount', 'UA-49010461-2']);
+          _gaq.push(['_trackPageview']);
+
+          (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+          })();
+
+        </script>
+    </body>
+</html>

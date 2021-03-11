@@ -31,7 +31,6 @@ if (process.env.HEROKU || process.env.TRAVIS) {
 }
 
 let redisClient;
-console.log("REDIS->", process.env.REDIS_URL);
 if (process.env.REDISTOGO_URL) {
   const rtg = url.parse(process.env.REDISTOGO_URL);
   redisClient = redis.createClient(rtg.port, rtg.hostname);

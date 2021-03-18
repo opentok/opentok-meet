@@ -12,11 +12,12 @@ module.exports = (app, config, redis, ot) => {
       }
     };
 
-    console.log(body);
+    let postURL = `${config.webviewcomposerUrl}/gr/riders`;
+    console.log(`Sending POST to ${postURL} with body`, body);
 
     request({
       method: 'POST',
-      uri: `${config.webviewcomposerUrl}/gr/riders`,
+      uri: postURL,
       json: true,
       body,
     }, (errPost, resPost) => {
@@ -25,15 +26,15 @@ module.exports = (app, config, redis, ot) => {
         && resPost.statusCode == 200
         && resPost.body.id !== undefined)
       {
-        console.log(resPost);
         let rider_id = resPost.body.id;
+        let putURL = `${config.webviewcomposerUrl}/gr/riders/${rider_id}`;
+        console.log(`POST OK!, Doing put to ${putURL}`);
         request({
           method: 'PUT',
-          uri: `${config.webviewcomposerUrl}/gr/riders/${rider_id}`,
+          uri: putURL,
           json: true,
           body: { "status": "start" },
         }, (errPut, resPut) => {
-          console.log(errPut, resPut);
           if (resPut !== undefined
             && resPut.statusCode == 200)
           {

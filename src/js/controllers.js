@@ -151,8 +151,14 @@ angular.module('opentok-meet').controller('RoomCtrl', ['$scope', '$http', '$wind
     };
 
     $scope.toggleWebcomposing = () => {
-      console.log(baseURL);
-      $window.open(`${baseURL + $scope.room}/webviewcomposerapp`);
+      RoomService.getWebviewComposerRoom().then((roomData) => {
+        let postData = roomData;
+        postData.url = `${window.location.href}/webviewcomposerapp`;
+        $http.post(`${baseURL + $scope.room}/startWebViewComposing`, postData)
+          .then((response) => {
+            console.log(response);
+          });
+      });
     };
 
     NotificationService.init();

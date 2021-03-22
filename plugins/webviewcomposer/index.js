@@ -40,11 +40,11 @@ module.exports = (app, config, redis, ot) => {
           {
             res.send(200);
           } else {
-            res.send(500);
+            res.send(400);
           }
         });
       } else {
-        res.send(500);
+        res.send(400);
       }
     });
   });

@@ -28,6 +28,9 @@ angular.module('opentok-meet').controller('RoomCtrl', ['$scope', '$http', '$wind
       fixedRatio: !$scope.zoomed,
     };
     $scope.filter = 'none';
+    $scope.webviewComposerRequestInflight = false;
+    $scope.webviewComposerId = null;
+    $scope.startingWebviewComposing = false;
 
     const facePublisherPropsHD = {
       name: 'face',
@@ -151,12 +154,23 @@ angular.module('opentok-meet').controller('RoomCtrl', ['$scope', '$http', '$wind
     };
 
     $scope.toggleWebcomposing = () => {
+      $scope.webviewComposerRequestInflight = true;
       RoomService.getWebviewComposerRoom().then((roomData) => {
         let postData = roomData;
         postData.url = `${window.location.href}/webviewcomposerapp`;
         $http.post(`${baseURL + $scope.room}/startWebViewComposing`, postData)
           .then((response) => {
-            console.log(response);
+            $scope.webviewComposerRequestInflight = false;
+            if (response.data.id) {
+              $scope.webviewComposerId = response.data.id;
+            } else {
+              console.log('Wrong answer from server', response.data);
+              $timeout(() => $scope.$broadcast('otError', {message: `Unexpected answer from server`}));
+            }
+          }, (error) => {
+            console.log('Failed to start webview composer: ', error);
+            $scope.webviewComposerRequestInflight = false;
+            $timeout(() => $scope.$broadcast('otError', {message: `Failed to start webview composer: ${error.statusText}`}));
           });
       });
     };

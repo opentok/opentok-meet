@@ -132,7 +132,7 @@
 
             <button type="button" name="webcomposer" id="webComposerBtn"
                 ng-if="!p2p && connected" ng-class="{green: !webcomposing, red: webcomposing}" class="icon-left ion-ios7-recording"
-                ng-click="toggleWebcomposing()" title="Webcomposer">Webcomposer</button>
+                                                                                               ng-click="toggleWebcomposing()" title="Webcomposer" ng-disabled="webviewComposerRequestInflight">Webcomposer</button>
 3
             <button type="button" name="muteCamera" mute-publisher ng-if="publishing" ng-class="{green: mutedVideo, red: !mutedVideo}" publisher-id="facePublisher" class="icon-left ion ion-person">Camera</button>
 
@@ -155,6 +155,12 @@
         <div id="statusMessages">
             <div id="archiveStatus" class="statusMessage" ng-if="archiveId">
                 Recording: When recording is ready it will be available <a href="/{{room}}/archive/{{archiveId}}" target="_blank">here</a>
+            </div>
+            <div id="startWebviewComposingStatus" class="statusMessage" ng-if="webviewComposerRequestInflight">
+              Starting WebView Composer...
+            </div>
+            <div id="webviewComposingStatus" class="statusMessage" ng-if="webviewComposerId">
+              Webview composing active. Publishing <a href="/{{room}}_wvc" target="_blank">here</a>
             </div>
             <screen-share-dialogs></screen-share-dialogs>
             <ot-errors></ot-errors>

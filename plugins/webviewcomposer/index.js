@@ -38,7 +38,7 @@ module.exports = (app, config, redis, ot) => {
           if (resPut !== undefined
             && resPut.statusCode == 200)
           {
-            res.send(200);
+            res.status(200).send({id: rider_id});
           } else {
             res.send(400);
           }

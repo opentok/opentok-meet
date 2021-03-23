@@ -154,25 +154,40 @@ angular.module('opentok-meet').controller('RoomCtrl', ['$scope', '$http', '$wind
     };
 
     $scope.toggleWebcomposing = () => {
+      if ($scope.webviewComposerRequestInflight) { return; }
       $scope.webviewComposerRequestInflight = true;
-      RoomService.getWebviewComposerRoom().then((roomData) => {
-        let postData = roomData;
-        postData.url = `${window.location.href}/webviewcomposerapp`;
-        $http.post(`${baseURL + $scope.room}/startWebViewComposing`, postData)
+      if ($scope.webviewComposerId) {
+        // stop
+        let postData = { id: $scope.webviewComposerId };
+        $http.post(`${baseURL + $scope.room}/stopWebViewComposing`, postData)
           .then((response) => {
             $scope.webviewComposerRequestInflight = false;
-            if (response.data.id) {
-              $scope.webviewComposerId = response.data.id;
-            } else {
-              console.log('Wrong answer from server', response.data);
-              $timeout(() => $scope.$broadcast('otError', {message: `Unexpected answer from server`}));
-            }
+            $scope.webviewComposerId = null;
           }, (error) => {
-            console.log('Failed to start webview composer: ', error);
             $scope.webviewComposerRequestInflight = false;
-            $timeout(() => $scope.$broadcast('otError', {message: `Failed to start webview composer: ${error.statusText}`}));
+            console.log('Failed to stop webview composer', error);
+            $timeout(() => $scope.$broadcast('otError', {message: `Failed to stop webview composer: ${error.statusText}`}));
           });
-      });
+      } else {
+        RoomService.getWebviewComposerRoom().then((roomData) => {
+          let postData = roomData;
+          postData.url = `${window.location.href}/webviewcomposerapp`;
+          $http.post(`${baseURL + $scope.room}/startWebViewComposing`, postData)
+            .then((response) => {
+              $scope.webviewComposerRequestInflight = false;
+              if (response.data.id) {
+                $scope.webviewComposerId = response.data.id;
+              } else {
+                console.log('Wrong answer from server', response.data);
+                $timeout(() => $scope.$broadcast('otError', {message: `Unexpected answer from server`}));
+              }
+            }, (error) => {
+              console.log('Failed to start webview composer: ', error);
+              $scope.webviewComposerRequestInflight = false;
+              $timeout(() => $scope.$broadcast('otError', {message: `Failed to start webview composer: ${error.statusText}`}));
+            });
+        });
+      }
     };
 
     NotificationService.init();

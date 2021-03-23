@@ -48,4 +48,25 @@ module.exports = (app, config, redis, ot) => {
       }
     });
   });
+
+  app.post('/:room/stopWebViewComposing', (req, res) => {
+    let rider_id = req.body.id;
+    let putURL = `${config.webviewcomposerUrl}/gr/riders/${rider_id}`;
+    console.log(`Stopping rider: ${putURL}`);
+    request({
+      method: 'PUT',
+      uri: putURL,
+      json: true,
+      body: { "status": "stop" },
+    }, (errPut, resPut) => {
+      console.log(errPut, resPut.statusCode, resPut.body);
+      if (resPut !== undefined
+           && resPut.statusCode == 200)
+      {
+        res.send(200);
+      } else {
+        res.send(400);
+      }
+    });
+  });
 };

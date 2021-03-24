@@ -155,8 +155,11 @@
             <div id="archiveStatus" class="statusMessage" ng-if="archiveId">
                 Recording: When recording is ready it will be available <a href="/{{room}}/archive/{{archiveId}}" target="_blank">here</a>
             </div>
-            <div id="startWebviewComposingStatus" class="statusMessage" ng-if="webviewComposerRequestInflight">
+            <div id="startWebviewComposingStatus" class="statusMessage" ng-if="webviewComposerRequestInflight && webviewComposerRequestAction == 'START'">
               Starting WebView Composer...
+            </div>
+            <div id="stopWebviewComposingStatus" class="statusMessage" ng-if="webviewComposerRequestInflight && webviewComposerRequestAction == 'STOP'">
+              Stopping WebView Composer...
             </div>
             <div id="webviewComposingStatus" class="statusMessage" ng-if="webviewComposerId">
               Webview composing active. Publishing <a href="/{{room}}_wvc" target="_blank">here</a>

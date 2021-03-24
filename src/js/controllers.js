@@ -153,12 +153,26 @@ angular.module('opentok-meet').controller('RoomCtrl', ['$scope', '$http', '$wind
       $scope.textChatUnread = false;
     };
 
+    const WebViewComposerSignals = {
+      INFLIGHT_STOP: "inflightStop",
+      INFLIGHT_START: "inflightStart",
+      RIDER_STARTED: "riderStarted",
+      RIDER_STOPPED: "riderStopped",
+      QUERY_RIDER: "queryRider",
+    };
+
+    const WebViewComposerInflightAction = {
+      START: "START",
+      STOP: "STOP",
+    }
+
     const reportInflighStart = () => {
       $scope.webviewComposerRequestInflight = true;
       $scope.session.signal({
         type: "wvc",
         data: {
-          msg: "inflightStart"
+          msg: WebViewComposerSignals.INFLIGHT_START,
+          action: $scope.webviewComposerRequestAction,
         }
       });
     };
@@ -168,17 +182,17 @@ angular.module('opentok-meet').controller('RoomCtrl', ['$scope', '$http', '$wind
       $scope.session.signal({
         type: "wvc",
         data: {
-          msg: "inflightStop"
+          msg: WebViewComposerSignals.INFLIGHT_STOP,
         }
       });
     };
 
-    const reportRiderStarted = (id) => {
+    const reportRiderStarted = () => {
       $scope.session.signal({
         type: "wvc",
         data: {
-          msg: "riderStarted",
-          id,
+          msg: WebViewComposerSignals.RIDER_STARTED,
+          id: $scope.webviewComposerId,
         }
       });
     };
@@ -187,7 +201,7 @@ angular.module('opentok-meet').controller('RoomCtrl', ['$scope', '$http', '$wind
       $scope.session.signal({
         type: "wvc",
         data: {
-          msg: "riderStopped"
+          msg: WebViewComposerSignals.RIDER_STOPPED,
         }
       });
     };
@@ -196,13 +210,15 @@ angular.module('opentok-meet').controller('RoomCtrl', ['$scope', '$http', '$wind
       $scope.session.signal({
         type: "wvc",
         data: {
-          msg: "queryRider"
+          msg: WebViewComposerSignals.QUERY_RIDER,
         }
       });
     };
 
     $scope.toggleWebcomposing = () => {
       if ($scope.webviewComposerRequestInflight) { return; }
+      $scope.webviewComposerRequestAction = $scope.webviewComposerId ?
+        WebViewComposerInflightAction.STOP : WebViewComposerInflightAction.START;
       reportInflighStart()
       if ($scope.webviewComposerId) {
         let postData = { id: $scope.webviewComposerId };
@@ -289,30 +305,37 @@ angular.module('opentok-meet').controller('RoomCtrl', ['$scope', '$http', '$wind
         // webview composer signalling
         $scope.session.on("signal:wvc", (event) => {
           if ($scope.session.connection && event.from.connectionId != $scope.session.connection.id) {
-            if (event.data.msg === "inflightStart" && !$scope.webviewComposerRequestInflight) {
+            if (event.data.msg === WebViewComposerSignals.INFLIGHT_START
+              && !$scope.webviewComposerRequestInflight)
+            {
               $scope.webviewComposerRequestInflight = true;
-            } else if (event.data.msg === "inflightStop" && $scope.webviewComposerRequestInflight) {
+              $scope.webviewComposerRequestAction = event.data.action;
+            } else if (event.data.msg === WebViewComposerSignals.INFLIGHT_STOP
+              && $scope.webviewComposerRequestInflight)
+            {
               $scope.webviewComposerRequestInflight = false;
-            } else if (event.data.msg === "riderStarted" && !$scope.webviewComposerId) {
+            } else if (event.data.msg === WebViewComposerSignals.RIDER_STARTED
+              && !$scope.webviewComposerId)
+            {
               console.log("started", event.data.id);
               $scope.webviewComposerId = event.data.id;
-            } else if (event.data.msg === "riderStopped" && $scope.webviewComposerId) {
+            } else if (event.data.msg === WebViewComposerSignals.RIDER_STOPPED
+              && $scope.webviewComposerId)
+            {
               $scope.webviewComposerId = null;
-            } else if (event.data.msg === "queryRider") {
-              // Inform a new joiner of the running rider
+            } else if (event.data.msg === WebViewComposerSignals.QUERY_RIDER) {
               if ($scope.webviewComposerId) {
                 reportRiderStarted($scope.webviewComposerId);
               } else if ($scope.webviewComposerRequestInflight) {
                 reportInflighStart();
               }
             }
-
-            console.log("Signal received", event.data.msg);
           }
         });
 
         queryRider();
       });
+
       const whiteboardUpdated = () => {
         if (!$scope.showWhiteboard && !$scope.whiteboardUnread) {
         // Someone did something to the whiteboard while we weren't looking

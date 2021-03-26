@@ -364,7 +364,9 @@ angular.module('opentok-meet').controller('RoomCtrl', ['$scope', '$http', '$wind
       $scope.$on('otEditorUpdate', editorUpdated);
       $scope.$on('otWhiteboardUpdate', whiteboardUpdated);
       $scope.$on('otTextchatMessage', textChatMessage);
-      $scope.publishing = true;
+
+      const params = new URLSearchParams($window.location.search);
+      $scope.publishing = (params.get('autoPublish') !== 'false');
     });
 
     $scope.$on('changeZoom', (event, expanded) => {

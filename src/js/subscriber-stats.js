@@ -147,6 +147,7 @@ angular.module('opentok-meet').directive('subscriberStats', ['OTSession', 'Stats
       restrict: 'E',
       scope: {
         stream: '=',
+        show: '=',
       },
       template: subscriberStatsHTML,
       link(scope, element) {
@@ -162,6 +163,11 @@ angular.module('opentok-meet').directive('subscriberStats', ['OTSession', 'Stats
               scope.stats = stats;
               scope.$apply();
             });
+          });
+
+          scope.showStats = scope.show;
+          subscriber.setStyle({
+            buttonDisplayMode: scope.showStats ? 'on' : 'auto',
           });
         }, 100);
 

@@ -18,7 +18,9 @@ angular.module('opentok-meet').factory('StatsService', ['$http', '$interval', 'b
       const lastStats = subscriberStats.lastStats;
       const lastLastStats = subscriberStats.lastLastStats;
 
+      console.error('Calling subscriber.getStats()');
       subscriber.getStats((err, stats) => {
+        console.error('getStats callback', err, stats);
         if (err) {
           console.error(err);
           return;
@@ -159,7 +161,9 @@ angular.module('opentok-meet').directive('subscriberStats', ['OTSession', 'Stats
           subscriber.on('connected', () => {
             subscriberId = subscriber.id;
 
+            console.error('Adding subscriber service to: ', subscriber);
             StatsService.addSubscriber(subscriber, (stats) => {
+              console.error('addSubscriber callback', stats);
               scope.stats = stats;
               scope.$apply();
             });

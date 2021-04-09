@@ -25,13 +25,13 @@
     </head>
     <body ng-controller="RoomCtrl" ng-class="{'mouse-move': mouseMove}">
         <div id='session' ng-class="{'session-connected': connected}">
-            <ot-layout props="layoutProps">
+            <ot-layout ng-if="isSubscribingUser" props="layoutProps">
                 <ot-subscriber ng-repeat="stream in streams | filter:notMine"
                     stream="stream"
                     props="{style: {nameDisplayMode: 'off'}}"
                     ng-class="{OT_big: expanded}"
                     ng-dblclick="$emit('changeSize')">
-                        <subscriber-stats stream="stream"></subscriber-stats>
+                   <subscriber-stats stream="stream"></subscriber-stats>
                         <subscriber-report stream="stream"></subscriber-report>
                         <restrict-framerate></restrict-framerate>
                         <mute-video mute-subscriber></mute-video>

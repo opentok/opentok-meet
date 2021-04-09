@@ -186,6 +186,10 @@ angular.module('opentok-meet').controller('RoomCtrl', ['$scope', '$http', '$wind
           return;
         }
         $scope.session = session;
+
+        $scope.isSubscribingUser = $scope.session.connections.length() <= 1; // NEW CODE
+        console.log("$scope.isSubscribingUser: ",$scope.isSubscribingUser);
+
         const connectDisconnect = (connected) => {
           $scope.$apply(() => {
             $scope.connected = connected;

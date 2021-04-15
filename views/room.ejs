@@ -18,20 +18,20 @@
           window.OTProperties = { enableErrorReporting: true };
         </script>
         <script src="/js/commons.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="<%=opentokJs%>"></script>
+        <script src="/js/localOt.js"></script>
         <link rel="stylesheet" href="//code.ionicframework.com/ionicons/1.5.2/css/ionicons.min.css" type="text/css" media="screen" title="no title" charset="utf-8">
         <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.14.2/codemirror.css" media="screen" title="no title" charset="utf-8">
         <script src="/js/room.bundle.min.js" type="text/javascript" charset="utf-8"></script>
     </head>
     <body ng-controller="RoomCtrl" ng-class="{'mouse-move': mouseMove}">
         <div id='session' ng-class="{'session-connected': connected}">
-            <ot-layout props="layoutProps">
+            <ot-layout ng-if="isSubscribingUser" props="layoutProps">
                 <ot-subscriber ng-repeat="stream in streams | filter:notMine"
                     stream="stream"
                     props="{style: {nameDisplayMode: 'off'}}"
                     ng-class="{OT_big: expanded}"
                     ng-dblclick="$emit('changeSize')">
-                        <subscriber-stats stream="stream"></subscriber-stats>
+                   <subscriber-stats stream="stream"></subscriber-stats>
                         <subscriber-report stream="stream"></subscriber-report>
                         <restrict-framerate></restrict-framerate>
                         <mute-video mute-subscriber></mute-video>

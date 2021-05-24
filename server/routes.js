@@ -38,7 +38,13 @@ module.exports = (app, config, redis, ot, redirectSSL) => {
     const room = req.param('room');
     const apiKey = req.param('apiKey');
     const secret = req.param('secret');
-    const tokenRole = req.query.tokenRole;
+    let { tokenRole } = req.query;
+
+    const isValidTokenRole = role =>
+      /^(?:moderator|publisher|subscriber)$/.test(role);
+
+    tokenRole = isValidTokenRole(tokenRole) ? tokenRole : 'publisher';
+
     res.format({
       json() {
         const goToRoom = (err, sessionId, pApiKey, pSecret) => {
@@ -61,7 +67,7 @@ module.exports = (app, config, redis, ot, redirectSSL) => {
               apiKey: (pApiKey && pSecret) ? pApiKey : config.apiKey,
               p2p: RoomStore.isP2P(room),
               token: otSDK.generateToken(sessionId, {
-                role: tokenRole || 'publisher',
+                role: tokenRole,
               }),
             });
           }

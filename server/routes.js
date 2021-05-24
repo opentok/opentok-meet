@@ -1,5 +1,6 @@
 const OpenTok = require('opentok');
 const roomstore = require('./roomstore.js');
+const isValidTokenRole = require('../src/js/isValidTokenRole');
 
 module.exports = (app, config, redis, ot, redirectSSL) => {
   const RoomStore = roomstore(redis, ot);
@@ -39,9 +40,6 @@ module.exports = (app, config, redis, ot, redirectSSL) => {
     const apiKey = req.param('apiKey');
     const secret = req.param('secret');
     let { tokenRole } = req.query;
-
-    const isValidTokenRole = role =>
-      /^(?:moderator|publisher|subscriber)$/.test(role);
 
     tokenRole = isValidTokenRole(tokenRole) ? tokenRole : 'publisher';
 

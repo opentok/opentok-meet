@@ -10,7 +10,7 @@ describe('isValidTokenRole', () => {
 
     const invalidTokenRole = `${tokenRole}s`;
 
-    it(`should return false since token role ${invalidTokenRole} is valid`, () => {
+    it(`should return false since token role ${invalidTokenRole} is invalid`, () => {
       expect(isValidTokenRole(invalidTokenRole)).toBe(false);
     });
   });

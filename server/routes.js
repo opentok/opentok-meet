@@ -65,7 +65,7 @@ module.exports = (app, config, redis, ot, redirectSSL) => {
               apiKey: (pApiKey && pSecret) ? pApiKey : config.apiKey,
               p2p: RoomStore.isP2P(room),
               token: otSDK.generateToken(sessionId, {
-                role: tokenRole,
+                role: tokenRole || 'moderator',
               }),
             });
           }

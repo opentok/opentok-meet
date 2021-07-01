@@ -1,49 +1,35 @@
 const request = require('request');
+const qs = require('qs');
 
 module.exports = (app, config, redis, ot) => {
 
   app.post('/:room/startWebViewComposing', (req, res) => {
+
     let body = {
       "url": req.body.url,
-      "opentok": {
-        "api_key": req.body.apiKey,
-        "session_id": req.body.sessionId,
-        "token": req.body.token
-      }
+      "projectId": req.body.apiKey,
+      "sessionId": req.body.sessionId,
+      "token": req.body.token
     };
 
-    let postURL = `${config.webviewcomposerUrl}/gr/riders`;
+    let postURL = `${config.webviewcomposerUrl}/render`;
     console.log(`Sending POST to ${postURL} with body`, body);
 
     request({
       method: 'POST',
       uri: postURL,
       json: true,
-      body,
+      body
     }, (errPost, resPost) => {
-      console.log(errPost, resPost.statusCode, resPost.body);
       if (resPost !== undefined
-        && resPost.statusCode == 200
+        && resPost.statusCode == 202
         && resPost.body.id !== undefined)
       {
         let rider_id = resPost.body.id;
-        let putURL = `${config.webviewcomposerUrl}/gr/riders/${rider_id}`;
-        console.log(`POST OK!, Doing put to ${putURL}`);
-        request({
-          method: 'PUT',
-          uri: putURL,
-          json: true,
-          body: { "status": "start" },
-        }, (errPut, resPut) => {
-          if (resPut !== undefined
-            && resPut.statusCode == 200)
-          {
-            res.status(200).send({id: rider_id});
-          } else {
-            res.send(400);
-          }
-        });
+        console.log(`Rider created with id: ${rider_id}`);
+        res.status(200).send({id: rider_id});
       } else {
+        console.log(`Failed to create the rider: ${errPost}`);
         res.send(400);
       }
     });
@@ -51,17 +37,20 @@ module.exports = (app, config, redis, ot) => {
 
   app.post('/:room/stopWebViewComposing', (req, res) => {
     let rider_id = req.body.id;
-    let putURL = `${config.webviewcomposerUrl}/gr/riders/${rider_id}`;
-    console.log(`Stopping rider: ${putURL}`);
+    let body = {
+      "id": rider_id
+    };
+    let deleteURL = `${config.webviewcomposerUrl}/render`;
+    console.log(`Stopping rider: ${deleteURL}`);
     request({
-      method: 'PUT',
-      uri: putURL,
+      method: 'DELETE',
+      uri: deleteURL,
       json: true,
-      body: { "status": "stop" },
-    }, (errPut, resPut) => {
-      console.log(errPut, resPut.statusCode, resPut.body);
-      if (resPut !== undefined
-           && resPut.statusCode == 200)
+      body
+    }, (errDelete, resDelete) => {
+      console.log(errDelete, resDelete.statusCode, resDelete.body);
+      if (resDelete !== undefined
+           && resDelete.statusCode == 200)
       {
         res.send(200);
       } else {

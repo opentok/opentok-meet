@@ -1,33 +1,29 @@
 const request = require('request');
-const qs = require('qs');
 
-module.exports = (app, config, redis, ot) => {
-
+module.exports = (app, config) => {
   app.post('/:room/startWebViewComposing', (req, res) => {
-
-    let body = {
-      "url": req.body.url,
-      "projectId": req.body.apiKey,
-      "sessionId": req.body.sessionId,
-      "token": req.body.token
+    const body = {
+      'url': req.body.url,
+      'projectId': req.body.apiKey,
+      'sessionId': req.body.sessionId,
+      'token': req.body.token,
     };
 
-    let postURL = `${config.webviewcomposerUrl}/render`;
+    const postURL = `${config.webviewcomposerUrl}/render`;
     console.log(`Sending POST to ${postURL} with body`, body);
 
     request({
       method: 'POST',
       uri: postURL,
       json: true,
-      body
+      body,
     }, (errPost, resPost) => {
       if (resPost !== undefined
-        && resPost.statusCode == 202
-        && resPost.body.id !== undefined)
-      {
-        let rider_id = resPost.body.id;
-        console.log(`Rider created with id: ${rider_id}`);
-        res.status(200).send({id: rider_id});
+        && resPost.statusCode === 202
+        && resPost.body.id !== undefined) {
+        const riderId = resPost.body.id;
+        console.log(`Rider created with id: ${riderId}`);
+        res.status(200).send({ id: riderId });
       } else {
         console.log(`Failed to create the rider: ${errPost}`);
         res.send(400);
@@ -36,22 +32,21 @@ module.exports = (app, config, redis, ot) => {
   });
 
   app.post('/:room/stopWebViewComposing', (req, res) => {
-    let rider_id = req.body.id;
-    let body = {
-      "id": rider_id
+    const riderId = req.body.id;
+    const body = {
+      id: riderId,
     };
-    let deleteURL = `${config.webviewcomposerUrl}/render`;
+    const deleteURL = `${config.webviewcomposerUrl}/render`;
     console.log(`Stopping rider: ${deleteURL}`);
     request({
       method: 'DELETE',
       uri: deleteURL,
       json: true,
-      body
+      body,
     }, (errDelete, resDelete) => {
       console.log(errDelete, resDelete.statusCode, resDelete.body);
       if (resDelete !== undefined
-           && resDelete.statusCode == 200)
-      {
+        && resDelete.statusCode === 200) {
         res.send(200);
       } else {
         res.send(400);

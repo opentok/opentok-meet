@@ -1,4 +1,6 @@
+
 const isValidTokenRole = require('../isValidTokenRole');
+
 const isp2p = room => room && room.toLowerCase().indexOf('p2p') > -1;
 
 angular.module('opentok-meet-login', [])

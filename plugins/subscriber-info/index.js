@@ -7,9 +7,6 @@ module.exports = (app, config, redis, ot) => {
 
 
   app.get('/:room/subscriber/:subscriberId', (req, res) => {
-    res.send(200);
-    return; // Disabled for now
-
     const room = req.param('room');
     const subscriberId = req.param('subscriberId');
 

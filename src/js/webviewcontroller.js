@@ -1,8 +1,7 @@
 angular.module('opentok-meet').controller('WebViewComposerAppCtrl', ['$scope', '$http', '$window', '$document',
   '$timeout', 'OTSession', 'RoomService', 'baseURL', 'SimulcastService', 'NotificationService',
   function WebViewComposerAppCtrl(
-    $scope, $http, $window, $document, $timeout, OTSession, RoomService, baseURL, SimulcastService,
-    NotificationService
+    $scope, $http, $window, $document, $timeout, OTSession, RoomService, baseURL, SimulcastService
   ) {
     $scope.streams = OTSession.streams;
     $scope.connections = OTSession.connections;

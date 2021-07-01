@@ -4,7 +4,7 @@ angular.module('opentok-meet').factory('RoomService', ['$http', 'baseURL', '$win
   function RoomService($http, baseURL, $window, room, tokenRole) {
     return {
       getRoom(roomName) {
-        let r = roomName || room;
+        const r = roomName || room;
         return $http.get(`${baseURL}${r}?tokenRole=${tokenRole}`)
           .then(response => response.data)
           .catch(response => response.data);
@@ -13,8 +13,8 @@ angular.module('opentok-meet').factory('RoomService', ['$http', 'baseURL', '$win
         $window.location.href = baseURL;
       },
       getWebviewComposerRoom() {
-        return this.getRoom(room + '_wvc');
-      }
+        return this.getRoom(`${room}_wvc`);
+      },
     };
   },
 ]);

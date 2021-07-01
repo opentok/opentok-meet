@@ -118,12 +118,10 @@ module.exports = (app, config, redis, ot, redirectSSL) => {
 
   app.get('/:room/webviewcomposerapp', (req, res) => {
     const room = req.param('room');
-    const apiKey = req.param('apiKey');
-    const secret = req.param('secret');
     res.render('webcomposerapp', {
-        opentokJs: config.opentokJs,
-        room,
-        chromeExtensionId: config.chromeExtensionId,
+      opentokJs: config.opentokJs,
+      room,
+      chromeExtensionId: config.chromeExtensionId,
     });
   });
 };

@@ -20,7 +20,7 @@ if (process.env.HEROKU || process.env.TRAVIS) {
     chromeExtensionId: process.env.CHROME_EXTENSION_ID,
     apiUrl: process.env.OT_API_URL || 'https://anvil-tbdev.opentok.com',
     opentokJs: process.env.OT_JS_URL || 'https://tbdev.tokbox.com/v2/js/opentok.js',
-    webviewcomposerUrl: process.env.WEBVIEW_COMPOSER_URL,
+    webViewComposerUrl: process.env.WEBVIEW_COMPOSER_URL,
   };
 } else {
   try {

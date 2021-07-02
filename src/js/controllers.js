@@ -170,7 +170,7 @@ angular.module('opentok-meet').controller('RoomCtrl', ['$scope', '$http', '$wind
       $scope.textChatUnread = false;
     };
 
-    const WebViewComposerSignals = {
+    const webViewComposerSignals = {
       INFLIGHT_STOP: 'inflightStop',
       INFLIGHT_START: 'inflightStart',
       RIDER_STARTED: 'riderStarted',
@@ -178,7 +178,7 @@ angular.module('opentok-meet').controller('RoomCtrl', ['$scope', '$http', '$wind
       QUERY_RIDER: 'queryRider',
     };
 
-    const WebViewComposerInflightAction = {
+    const webViewComposerInflightAction = {
       START: 'START',
       STOP: 'STOP',
     };
@@ -188,7 +188,7 @@ angular.module('opentok-meet').controller('RoomCtrl', ['$scope', '$http', '$wind
       $scope.session.signal({
         type: 'wvc',
         data: {
-          msg: WebViewComposerSignals.INFLIGHT_START,
+          msg: webViewComposerSignals.INFLIGHT_START,
           action: $scope.webviewComposerRequestAction,
         },
       });
@@ -199,7 +199,7 @@ angular.module('opentok-meet').controller('RoomCtrl', ['$scope', '$http', '$wind
       $scope.session.signal({
         type: 'wvc',
         data: {
-          msg: WebViewComposerSignals.INFLIGHT_STOP,
+          msg: webViewComposerSignals.INFLIGHT_STOP,
         },
       });
     };
@@ -208,7 +208,7 @@ angular.module('opentok-meet').controller('RoomCtrl', ['$scope', '$http', '$wind
       $scope.session.signal({
         type: 'wvc',
         data: {
-          msg: WebViewComposerSignals.RIDER_STARTED,
+          msg: webViewComposerSignals.RIDER_STARTED,
           id: $scope.webviewComposerId,
         },
       });
@@ -218,7 +218,7 @@ angular.module('opentok-meet').controller('RoomCtrl', ['$scope', '$http', '$wind
       $scope.session.signal({
         type: 'wvc',
         data: {
-          msg: WebViewComposerSignals.RIDER_STOPPED,
+          msg: webViewComposerSignals.RIDER_STOPPED,
         },
       });
     };
@@ -227,7 +227,7 @@ angular.module('opentok-meet').controller('RoomCtrl', ['$scope', '$http', '$wind
       $scope.session.signal({
         type: 'wvc',
         data: {
-          msg: WebViewComposerSignals.QUERY_RIDER,
+          msg: webViewComposerSignals.QUERY_RIDER,
         },
       });
     };
@@ -235,11 +235,11 @@ angular.module('opentok-meet').controller('RoomCtrl', ['$scope', '$http', '$wind
     $scope.toggleWebcomposing = () => {
       if ($scope.webviewComposerRequestInflight) { return; }
       $scope.webviewComposerRequestAction = $scope.webviewComposerId ?
-        WebViewComposerInflightAction.STOP : WebViewComposerInflightAction.START;
+        webViewComposerInflightAction.STOP : webViewComposerInflightAction.START;
       reportInflighStart();
       if ($scope.webviewComposerId) {
         const postData = { id: $scope.webviewComposerId };
-        $http.post(`${baseURL + $scope.room}/stopWebViewComposing`, postData)
+        $http.post(`${baseURL + $scope.room}/stop-web-view-composing`, postData)
           .then(() => {
             reportInflighStop();
             reportRiderStopped();
@@ -252,8 +252,8 @@ angular.module('opentok-meet').controller('RoomCtrl', ['$scope', '$http', '$wind
       } else {
         RoomService.getWebviewComposerRoom().then((roomData) => {
           const postData = roomData;
-          postData.url = `${window.location.href}/webviewcomposerapp`;
-          $http.post(`${baseURL + $scope.room}/startWebViewComposing`, postData)
+          postData.url = `${window.location.href}/webview-composer-app`;
+          $http.post(`${baseURL + $scope.room}/start-web-view-composing`, postData)
             .then((response) => {
               reportInflighStop();
               if (response.data.id) {
@@ -322,21 +322,21 @@ angular.module('opentok-meet').controller('RoomCtrl', ['$scope', '$http', '$wind
         // webview composer signalling
         $scope.session.on('signal:wvc', (event) => {
           if ($scope.session.connection && event.from.connectionId !== $scope.session.connection.id) {
-            if (event.data.msg === WebViewComposerSignals.INFLIGHT_START
+            if (event.data.msg === webViewComposerSignals.INFLIGHT_START
               && !$scope.webviewComposerRequestInflight) {
               $scope.webviewComposerRequestInflight = true;
               $scope.webviewComposerRequestAction = event.data.action;
-            } else if (event.data.msg === WebViewComposerSignals.INFLIGHT_STOP
+            } else if (event.data.msg === webViewComposerSignals.INFLIGHT_STOP
               && $scope.webviewComposerRequestInflight) {
               $scope.webviewComposerRequestInflight = false;
-            } else if (event.data.msg === WebViewComposerSignals.RIDER_STARTED
+            } else if (event.data.msg === webViewComposerSignals.RIDER_STARTED
               && !$scope.webviewComposerId) {
               console.log('started', event.data.id);
               $scope.webviewComposerId = event.data.id;
-            } else if (event.data.msg === WebViewComposerSignals.RIDER_STOPPED
+            } else if (event.data.msg === webViewComposerSignals.RIDER_STOPPED
               && $scope.webviewComposerId) {
               $scope.webviewComposerId = null;
-            } else if (event.data.msg === WebViewComposerSignals.QUERY_RIDER) {
+            } else if (event.data.msg === webViewComposerSignals.QUERY_RIDER) {
               if ($scope.webviewComposerId) {
                 reportRiderStarted($scope.webviewComposerId);
               } else if ($scope.webviewComposerRequestInflight) {

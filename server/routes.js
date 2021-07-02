@@ -116,11 +116,12 @@ module.exports = (app, config, redis, ot, redirectSSL) => {
     RoomStore.getRoom(req.params.room, null, null, setClassList);
   });
 
-  app.get('/:room/webviewcomposerapp', (req, res) => {
+  app.get('/:room/webview-composer-app', (req, res) => {
     const room = req.param('room');
     res.render('webcomposerapp', {
       opentokJs: config.opentokJs,
       room,
+      tokenRole: 'subscriber',
       chromeExtensionId: config.chromeExtensionId,
     });
   });

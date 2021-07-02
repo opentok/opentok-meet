@@ -1,7 +1,7 @@
 const request = require('request');
 
 module.exports = (app, config) => {
-  app.post('/:room/startWebViewComposing', (req, res) => {
+  app.post('/:room/start-web-view-composing', (req, res) => {
     const body = {
       'url': req.body.url,
       'projectId': req.body.apiKey,
@@ -9,7 +9,7 @@ module.exports = (app, config) => {
       'token': req.body.token,
     };
 
-    const postURL = `${config.webviewcomposerUrl}/render`;
+    const postURL = `${config.webViewComposerUrl}/render`;
     console.log(`Sending POST to ${postURL} with body`, body);
 
     request({
@@ -18,9 +18,7 @@ module.exports = (app, config) => {
       json: true,
       body,
     }, (errPost, resPost) => {
-      if (resPost !== undefined
-        && resPost.statusCode === 202
-        && resPost.body.id !== undefined) {
+      if (resPost && resPost.statusCode === 202 && resPost.body.id) {
         const riderId = resPost.body.id;
         console.log(`Rider created with id: ${riderId}`);
         res.status(200).send({ id: riderId });
@@ -31,12 +29,12 @@ module.exports = (app, config) => {
     });
   });
 
-  app.post('/:room/stopWebViewComposing', (req, res) => {
+  app.post('/:room/stop-web-view-composing', (req, res) => {
     const riderId = req.body.id;
     const body = {
       id: riderId,
     };
-    const deleteURL = `${config.webviewcomposerUrl}/render`;
+    const deleteURL = `${config.webViewComposerUrl}/render`;
     console.log(`Stopping rider: ${deleteURL}`);
     request({
       method: 'DELETE',
@@ -45,8 +43,7 @@ module.exports = (app, config) => {
       body,
     }, (errDelete, resDelete) => {
       console.log(errDelete, resDelete.statusCode, resDelete.body);
-      if (resDelete !== undefined
-        && resDelete.statusCode === 200) {
+      if (resDelete && resDelete.statusCode === 200) {
         res.send(200);
       } else {
         res.send(400);

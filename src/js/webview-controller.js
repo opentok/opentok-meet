@@ -23,7 +23,7 @@ angular.module('opentok-meet').controller('WebViewComposerAppCtrl', ['$scope', '
       stream.connection.connectionId !== $scope.session.connection.connectionId;
 
     $scope.getPublisher = id => OTSession.publishers.filter(x => x.id === id)[0];
-
+    
     // Fetch the room info
     RoomService.getRoom().then((roomData) => {
       if ($scope.session) {

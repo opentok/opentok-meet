@@ -9,7 +9,7 @@ function SubscriberStats(subscriber, onStats) {
 }
 
 angular.module('opentok-meet').factory('StatsService', ['$http', '$interval', 'baseURL', 'room',
-  function StatsService($http, $interval, baseURL, room) {
+  function StatsService($http, $interval/* , baseURL, room */) {
     let interval;
     const subscribers = {}; // A collection of SubscriberStats objects keyed by subscriber.id
 
@@ -17,7 +17,7 @@ angular.module('opentok-meet').factory('StatsService', ['$http', '$interval', 'b
       const subscriber = subscriberStats.subscriber;
       const lastStats = subscriberStats.lastStats;
       const lastLastStats = subscriberStats.lastLastStats;
-
+      
       subscriber.getStats((err, stats) => {
         if (err) {
           console.error(err);
@@ -88,19 +88,19 @@ angular.module('opentok-meet').factory('StatsService', ['$http', '$interval', 'b
         }
 
         // The below is only executed on the first call to getStats
-
-        const widgetId = subscriberStats.subscriber.widgetId;
-        $http.get(`${baseURL + room}/subscriber/${widgetId}`)
-          .then((res) => {
-            if (res && res.data && res.data.info) {
-              currStats.info = res.data.info;
-            } else {
-              console.info('received error response  ', res);
-            }
-          })
-          .catch((getErr) => {
-            console.trace('failed to retrieve susbcriber info ', getErr);
-          });
+        // Commented since it is not need for now
+        // const widgetId = subscriberStats.subscriber.widgetId;
+        // $http.get(`${baseURL + room}/subscriber/${widgetId}`)
+        //   .then((res) => {
+        //     if (res && res.data && res.data.info) {
+        //       currStats.info = res.data.info;
+        //     } else {
+        //       console.info('received error response  ', res);
+        //     }
+        //   })
+        //   .catch((getErr) => {
+        //     console.trace('failed to retrieve susbcriber info ', getErr);
+        //   });
 
         // Listen to internal qos events to figure out the audio and video codecs
         const qosHandler = (qos) => {
@@ -147,6 +147,7 @@ angular.module('opentok-meet').directive('subscriberStats', ['OTSession', 'Stats
       restrict: 'E',
       scope: {
         stream: '=',
+        show: '=',
       },
       template: subscriberStatsHTML,
       link(scope, element) {
@@ -158,10 +159,17 @@ angular.module('opentok-meet').directive('subscriberStats', ['OTSession', 'Stats
           subscriber.on('connected', () => {
             subscriberId = subscriber.id;
 
+            console.error('Adding subscriber service to: ', subscriber);
             StatsService.addSubscriber(subscriber, (stats) => {
+              console.error('addSubscriber callback', stats);
               scope.stats = stats;
               scope.$apply();
             });
+          });
+
+          scope.showStats = scope.show;
+          subscriber.setStyle({
+            buttonDisplayMode: scope.showStats ? 'on' : 'auto',
           });
         }, 100);
 

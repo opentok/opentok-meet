@@ -20,6 +20,7 @@ if (process.env.HEROKU || process.env.TRAVIS) {
     chromeExtensionId: process.env.CHROME_EXTENSION_ID,
     apiUrl: process.env.OT_API_URL || 'https://anvil-tbdev.opentok.com',
     opentokJs: process.env.OT_JS_URL || 'https://tbdev.tokbox.com/v2/js/opentok.js',
+    webViewComposerUrl: process.env.WEBVIEW_COMPOSER_URL,
   };
 } else {
   try {
@@ -35,6 +36,8 @@ if (process.env.REDISTOGO_URL) {
   const rtg = url.parse(process.env.REDISTOGO_URL);
   redisClient = redis.createClient(rtg.port, rtg.hostname);
   redisClient.auth(rtg.auth.split(':')[1]);
+} else if (process.env.REDIS_URL) {
+  redisClient = redis.createClient(process.env.REDIS_URL);
 } else {
   redisClient = redis.createClient();
 }

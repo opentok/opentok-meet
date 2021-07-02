@@ -131,6 +131,9 @@
                 ng-if="!p2p && connected" ng-class="{green: !archiving, red: archiving}" class="icon-left ion-ios7-recording"
                 ng-click="toggleArchiving()" title="Record">Record</button>
 
+            <button type="button" name="webcomposer" id="webComposerBtn"
+                ng-if="!p2p && connected" ng-class="{green: !webviewComposerId, red: webviewComposerId}" class="icon-left ion-ios7-recording" ng-click="toggleWebcomposing()" title="Webcomposer" ng-disabled="webviewComposerRequestInflight">Webcomposer</button>
+
             <button type="button" name="muteCamera" mute-publisher ng-if="publishing" ng-class="{green: mutedVideo, red: !mutedVideo}" publisher-id="facePublisher" class="icon-left ion ion-person">Camera</button>
 
             <button type="button" name="muteMicrophone" muted-type="Audio" ng-if="publishing" mute-publisher ng-class="{green: mutedAudio, red: !mutedAudio, 'ion-ios7-mic-off': mutedAudio, 'ion-ios7-mic': !mutedAudio}" publisher-id="facePublisher" class="icon-left ion">Mic</button>
@@ -155,6 +158,15 @@
         <div id="statusMessages">
             <div id="archiveStatus" class="statusMessage" ng-if="archiveId">
                 Recording: When recording is ready it will be available <a href="/{{room}}/archive/{{archiveId}}" target="_blank">here</a>
+            </div>
+            <div id="startWebviewComposingStatus" class="statusMessage" ng-if="webviewComposerRequestInflight && webviewComposerRequestAction == 'START'">
+              Starting WebView Composer...
+            </div>
+            <div id="stopWebviewComposingStatus" class="statusMessage" ng-if="webviewComposerRequestInflight && webviewComposerRequestAction == 'STOP'">
+              Stopping WebView Composer...
+            </div>
+            <div id="webviewComposingStatus" class="statusMessage" ng-if="webviewComposerId">
+              Webview composing active. Publishing <a href="/{{room}}_wvc?autoPublish=false" target="_blank">here</a>
             </div>
             <screen-share-dialogs></screen-share-dialogs>
             <ot-errors></ot-errors>

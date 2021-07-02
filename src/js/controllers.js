@@ -28,6 +28,9 @@ angular.module('opentok-meet').controller('RoomCtrl', ['$scope', '$http', '$wind
       fixedRatio: !$scope.zoomed,
     };
     $scope.filter = 'none';
+    $scope.webviewComposerRequestInflight = false;
+    $scope.webviewComposerId = null;
+    $scope.startingWebviewComposing = false;
 
     const facePublisherPropsHD = {
       name: 'face',
@@ -59,7 +62,7 @@ angular.module('opentok-meet').controller('RoomCtrl', ['$scope', '$http', '$wind
 
     $scope.togglePublish = (publishHD) => {
       if (!$scope.publishing) {
-      // If they unpublish and publish again then prompt them to change their devices
+        // If they unpublish and publish again then prompt them to change their devices
         facePublisherPropsHD.usePreviousDeviceSelection = false;
         $scope.facePublisherProps = publishHD ? facePublisherPropsHD : facePublisherPropsSD;
       }
@@ -124,15 +127,13 @@ angular.module('opentok-meet').controller('RoomCtrl', ['$scope', '$http', '$wind
       }
       OT.publishers.forEach((publisher) => {
         if (publisher.stream) {
-          url += ` publisher streamId: ${publisher.stream.streamId
-          } publisher stream type: ${publisher.stream.videoType}`;
+          url += ` publisher streamId: ${publisher.stream.streamId} publisher stream type: ${publisher.stream.videoType}`;
         }
       });
       OT.subscribers.forEach((subscriber) => {
         if (subscriber.stream) {
-          url += ` subscriber streamId: ${subscriber.stream.streamId
-          } subscriber stream type: ${subscriber.stream.videoType
-          } subscriber id: ${subscriber.id}`;
+          url += ` subscriber streamId: ${subscriber.stream.streamId} 
+            subscriber stream type: ${subscriber.stream.videoType} subscriber id: ${subscriber.id}`;
         }
       });
       $window.open(url);
@@ -167,6 +168,108 @@ angular.module('opentok-meet').controller('RoomCtrl', ['$scope', '$http', '$wind
     $scope.toggleTextchat = () => {
       $scope.showTextchat = !$scope.showTextchat;
       $scope.textChatUnread = false;
+    };
+
+    const webViewComposerSignals = {
+      INFLIGHT_STOP: 'inflightStop',
+      INFLIGHT_START: 'inflightStart',
+      RIDER_STARTED: 'riderStarted',
+      RIDER_STOPPED: 'riderStopped',
+      QUERY_RIDER: 'queryRider',
+    };
+
+    const webViewComposerInflightAction = {
+      START: 'START',
+      STOP: 'STOP',
+    };
+
+    const reportInflighStart = () => {
+      $scope.webviewComposerRequestInflight = true;
+      $scope.session.signal({
+        type: 'wvc',
+        data: {
+          msg: webViewComposerSignals.INFLIGHT_START,
+          action: $scope.webviewComposerRequestAction,
+        },
+      });
+    };
+
+    const reportInflighStop = () => {
+      $scope.webviewComposerRequestInflight = false;
+      $scope.session.signal({
+        type: 'wvc',
+        data: {
+          msg: webViewComposerSignals.INFLIGHT_STOP,
+        },
+      });
+    };
+
+    const reportRiderStarted = () => {
+      $scope.session.signal({
+        type: 'wvc',
+        data: {
+          msg: webViewComposerSignals.RIDER_STARTED,
+          id: $scope.webviewComposerId,
+        },
+      });
+    };
+
+    const reportRiderStopped = () => {
+      $scope.session.signal({
+        type: 'wvc',
+        data: {
+          msg: webViewComposerSignals.RIDER_STOPPED,
+        },
+      });
+    };
+
+    const queryRider = () => {
+      $scope.session.signal({
+        type: 'wvc',
+        data: {
+          msg: webViewComposerSignals.QUERY_RIDER,
+        },
+      });
+    };
+
+    $scope.toggleWebcomposing = () => {
+      if ($scope.webviewComposerRequestInflight) { return; }
+      $scope.webviewComposerRequestAction = $scope.webviewComposerId ?
+        webViewComposerInflightAction.STOP : webViewComposerInflightAction.START;
+      reportInflighStart();
+      if ($scope.webviewComposerId) {
+        const postData = { id: $scope.webviewComposerId };
+        $http.post(`${baseURL + $scope.room}/stop-web-view-composing`, postData)
+          .then(() => {
+            reportInflighStop();
+            reportRiderStopped();
+            $scope.webviewComposerId = null;
+          }, (error) => {
+            reportInflighStop();
+            console.log('Failed to stop webview composer', error);
+            $timeout(() => $scope.$broadcast('otError', { message: `Failed to stop webview composer: ${error.statusText}` }));
+          });
+      } else {
+        RoomService.getWebviewComposerRoom().then((roomData) => {
+          const postData = roomData;
+          postData.url = `${window.location.href}/webview-composer-app`;
+          $http.post(`${baseURL + $scope.room}/start-web-view-composing`, postData)
+            .then((response) => {
+              reportInflighStop();
+              if (response.data.id) {
+                $scope.webviewComposerId = response.data.id;
+                reportRiderStarted($scope.webviewComposerId);
+              } else {
+                console.log('Wrong answer from server', response.data);
+                $timeout(() => $scope.$broadcast('otError', { message: 'Unexpected answer from server' }));
+              }
+            }, (error) => {
+              console.log('Failed to start webview composer: ', error);
+              reportInflighStop();
+              $timeout(() => $scope.$broadcast('otError', { message: `Failed to start webview composer: ${error.statusText}` }));
+            });
+        });
+      }
     };
 
     NotificationService.init();
@@ -206,7 +309,7 @@ angular.module('opentok-meet').controller('RoomCtrl', ['$scope', '$http', '$wind
         $scope.session.on('sessionConnected', connectDisconnect.bind($scope.session, true));
         $scope.session.on('sessionDisconnected', connectDisconnect.bind($scope.session, false));
         $scope.session.on('archiveStarted archiveStopped', (event) => {
-        // event.id is the archiveId
+          // event.id is the archiveId
           $scope.$apply(() => {
             $scope.archiveId = event.id;
             $scope.archiving = (event.type === 'archiveStarted');
@@ -215,10 +318,40 @@ angular.module('opentok-meet').controller('RoomCtrl', ['$scope', '$http', '$wind
         SimulcastService.init($scope.streams, $scope.session);
         $scope.session.on('sessionReconnecting', reconnecting.bind($scope.session, true));
         $scope.session.on('sessionReconnected', reconnecting.bind($scope.session, false));
+
+        // webview composer signalling
+        $scope.session.on('signal:wvc', (event) => {
+          if ($scope.session.connection && event.from.connectionId !== $scope.session.connection.id) {
+            if (event.data.msg === webViewComposerSignals.INFLIGHT_START
+              && !$scope.webviewComposerRequestInflight) {
+              $scope.webviewComposerRequestInflight = true;
+              $scope.webviewComposerRequestAction = event.data.action;
+            } else if (event.data.msg === webViewComposerSignals.INFLIGHT_STOP
+              && $scope.webviewComposerRequestInflight) {
+              $scope.webviewComposerRequestInflight = false;
+            } else if (event.data.msg === webViewComposerSignals.RIDER_STARTED
+              && !$scope.webviewComposerId) {
+              console.log('started', event.data.id);
+              $scope.webviewComposerId = event.data.id;
+            } else if (event.data.msg === webViewComposerSignals.RIDER_STOPPED
+              && $scope.webviewComposerId) {
+              $scope.webviewComposerId = null;
+            } else if (event.data.msg === webViewComposerSignals.QUERY_RIDER) {
+              if ($scope.webviewComposerId) {
+                reportRiderStarted($scope.webviewComposerId);
+              } else if ($scope.webviewComposerRequestInflight) {
+                reportInflighStart();
+              }
+            }
+          }
+        });
+
+        queryRider();
       });
+
       const whiteboardUpdated = () => {
         if (!$scope.showWhiteboard && !$scope.whiteboardUnread) {
-        // Someone did something to the whiteboard while we weren't looking
+          // Someone did something to the whiteboard while we weren't looking
           $scope.$apply(() => {
             $scope.whiteboardUnread = true;
             $scope.mouseMove = true; // Show the bottom bar
@@ -227,7 +360,7 @@ angular.module('opentok-meet').controller('RoomCtrl', ['$scope', '$http', '$wind
       };
       const editorUpdated = () => {
         if (!$scope.showEditor && !$scope.editorUnread) {
-        // Someone did something to the editor while we weren't looking
+          // Someone did something to the editor while we weren't looking
           $scope.$apply(() => {
             $scope.editorUnread = true;
             $scope.mouseMove = true; // Show the bottom bar
@@ -244,7 +377,9 @@ angular.module('opentok-meet').controller('RoomCtrl', ['$scope', '$http', '$wind
       $scope.$on('otEditorUpdate', editorUpdated);
       $scope.$on('otWhiteboardUpdate', whiteboardUpdated);
       $scope.$on('otTextchatMessage', textChatMessage);
-      $scope.publishing = true;
+
+      const params = new URLSearchParams($window.location.search);
+      $scope.publishing = (params.get('autoPublish') !== 'false');
     });
 
     $scope.$on('changeZoom', (event, expanded) => {

@@ -23,6 +23,7 @@ require('./subscriber-stats.js');
 require('./subscriber-report.js');
 require('./publisher-stats.js');
 require('./controllers.js');
+require('./webview-controller.js');
 require('./services.js');
 require('./screen/directive.js');
 require('./simulcast-service.js');
